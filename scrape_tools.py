@@ -3,7 +3,16 @@ import requests
 import re
 
 def get_html(url):
-	sephora_page = requests.get(url)
+	sephora_page = ''
+	while sephora_page == '':
+		try:
+			sephora_page = requests.get(url)
+			break
+		except:
+			print("Connection refused by the server..")
+			print("Sleeping for 5 seconds")
+			time.sleep(5)
+			continue
 	return BeautifulSoup(sephora_page.content, 'lxml')
 
 def find_num_pages(sephora_html):
@@ -14,3 +23,4 @@ def find_num_pages(sephora_html):
 def find_product_urls(sephora_html): 
 	script_string = sephora_html.find_all('script', {'type' : 'application/ld+json'})[1].get_text()
 	return re.findall('(?<="url":").*?(?=\")', script_string)
+
